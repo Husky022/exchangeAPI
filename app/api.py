@@ -3,9 +3,6 @@ from utils.exchange import available_rates, get_currency
 
 app = FastAPI()
 
-class UnicornException(Exception):
-    def __init__(self, name: str):
-        self.name = name
 
 @app.get("/")
 async def root():
