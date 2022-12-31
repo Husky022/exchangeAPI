@@ -3,10 +3,14 @@ from utils.exchange import available_rates, get_currency
 
 app = FastAPI()
 
+class UnicornException(Exception):
+    def __init__(self, name: str):
+        self.name = name
 
 @app.get("/")
 async def root():
     return {"message": "Welcome to exchange API, /rates - получение конвертации, /available-rates - доступные валюты"}
+
 
 
 @app.get("/available-rates")
@@ -15,5 +19,5 @@ async def all_rates():
 
 
 @app.get("/rates")
-async def exchange(from_: str, to: str, value: int):
-    return {"result": get_currency(from_, to, value)}
+async def exchange(sale: str, buy: str, quantity: int):
+    return {"result": get_currency(sale, buy, quantity)}

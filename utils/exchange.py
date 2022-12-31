@@ -6,27 +6,43 @@ url = 'https://www.cbr-xml-daily.ru/daily_json.js'
 # получение списка доступных валют
 def available_rates():
     result = {}
+    valute_dict = {}
     try:
         response = requests.get(url).json()['Valute'].items()
         for k, v in response:
-            result[k] = v['Name']
-        result['RUB'] = 'Российский рубль'
+            valute_dict[k] = v['Name']
+        valute_dict['RUB'] = 'Российский рубль'
+        result['status'] = 'OK'
+        result['body'] = valute_dict
         return result
-    except Exception as e:
-        return e
+    except Exception:
+        result['status'] = 'Error'
+        result['message'] = 'Ошибка при работе сервиса, повторите попытку позже.'
+        return result
 
 # конвертация из одной валюты в другую
-def get_currency(from_, to, val):
-    response = requests.get(url).json()['Valute']
+def get_currency(sale, buy, quantity):
+    result = {}
     try:
-        if from_ == 'RUB':
-            valute_from = 1
-        else:
-            valute_from = response[from_]['Value']
-        if to == 'RUB':
-            valute_to = 1
-        else:
-            valute_to = response[to]['Value']
-        return round((valute_from / valute_to * val), 2)
-    except KeyError:
-        return 'Некорректная пара валют. Доступные валюты по адресу: /available-rates'
+        response = requests.get(url).json()['Valute']
+        try:
+            if sale == 'RUB':
+                valute_from = 1
+            else:
+                valute_from = response[sale]['Value']
+            if buy == 'RUB':
+                valute_to = 1
+            else:
+                valute_to = response[buy]['Value']
+            result['status'] = 'OK'
+            result['body'] = round((valute_from / valute_to * quantity), 2)
+            return result
+        except KeyError:
+            result['status'] = 'Error'
+            result['message'] = 'Некорректная пара валют. Доступные валюты по адресу: /available-rates'
+            return result
+    except Exception:
+        result['status'] = 'Error'
+        result['message'] = 'Ошибка при работе сервиса, повторите попытку позже.'
+        return result
+
